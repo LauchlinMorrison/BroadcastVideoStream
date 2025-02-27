@@ -16,10 +16,12 @@ class Consumer:
         self._fps_history_iter = 0
 
     def set_multicast_address(self, port, ip="224.1.1.1"):
+        """Set the UDP multicast address. (Port & IP)"""
         self.multicast_port = port
         self.multicast_ip = ip
     
     def display_fps(self, isDisplayed=True):
+        """Set the display FPS state."""
         self._display_fps = isDisplayed
 
     def __draw_fps(self, frame):
@@ -61,21 +63,14 @@ class Consumer:
                 expected_chunks = total_chunks
             chunk_list.append(chunk_data)
 
+            # Decode and display if we've received all the data.
             if len(chunk_list) == expected_chunks:
                 data = b''.join(chunk_list)
                 np_arr = np.frombuffer(data, dtype=np.uint8)
                 frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
                 if frame is not None:
-                    frame = self.process_frame(frame)
-                    if self._display_fps == True: frame = self.__draw_fps(frame)
-                    cv2.imshow(self.name, frame)
-
-                    # ESC key or close window to exit.
-                    if cv2.waitKey(1) == 27:
-                        break
-                    if cv2.getWindowProperty(self.name ,cv2.WND_PROP_VISIBLE) < 1:
-                        break
+                    if not self.__show_frame(frame): break
 
                 chunk_list.clear()
                 expected_chunks = 0
@@ -83,11 +78,28 @@ class Consumer:
         consumer_socket.close()
         cv2.destroyAllWindows()
     
+    def __show_frame(self, frame):
+        """
+        Performs any processing to the frame and display's it to the screen.
+        Returns false if the process should end.
+        """
+        frame = self.process_frame(frame)
+        if self._display_fps == True: frame = self.__draw_fps(frame)
+        cv2.imshow(self.name, frame)
+
+        # ESC key or close window to exit.
+        if cv2.waitKey(1) == 27:
+            return False
+        if cv2.getWindowProperty(self.name ,cv2.WND_PROP_VISIBLE) < 1:
+            return False
+        return True
+
     def process_frame(self, frame):
         # override in children
         return frame
     
     def start(self):
+        """Start the consumer process."""
         # Process over thread due to openCV shared gui objects not behaving correctly with threading.
         # Process doesn't seem to like starting private methods due to serialization so this one's remaining public for now.
         process = multiprocessing.Process(target=self.display_multicast_udp)

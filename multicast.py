@@ -36,19 +36,6 @@ def main():
 
     print("All Processes joined")
 
-    # consumer = multiprocessing.Process(target=csmr.display_multicast_udp)
-    # consumer.start()
-    # consumer2 = multiprocessing.Process(target=csmr.display_multicast_udp, args=("Display 2",))
-    # consumer2.start()
-
-    # videoStream = multiprocessing.Process(target=bc.broadcast_udp_multicast, args=(videoSource, "0.0.0.0", 5001, "224.1.1.1"))
-    # videoStream.start()
-
-    # consumer3 = multiprocessing.Process(target=csmr.display_multicast_udp, args=("Video Display", "0.0.0.0", 5001, "224.1.1.1"))
-    # consumer3.start()
-    # consumer4 = multiprocessing.Process(target=csmr.display_multicast_udp, args=("Video Display2", "0.0.0.0", 5001, "224.1.1.1"))
-    # consumer4.start()
-
 
 if __name__ == "__main__":
     main()

@@ -40,7 +40,6 @@ class Broadcaster:
                 # Send the chunk to the multicast group
                 broadcaster_socket.sendto(packet, (multicast_ip, multicast_port))
 
-            # Do I need a sleep here to match fps?
             time.sleep(sleepTime)
     
         print("Broadcast Ended")
