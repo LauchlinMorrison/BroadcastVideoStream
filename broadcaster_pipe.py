@@ -6,22 +6,23 @@ import time
 class Broadcast:
     def __init__(self, name, source=0):
         self.name = name
-        self._queues = {}
+        self._pipes = {}
         self.source = source
 
-    def attach(self, consumer):
-        if consumer.name in self._queues:
-            raise Exception(f"Already attached to this consumer.")
+    def subscribe(self, consumer):
+        name = consumer.name
+        if name in self._pipes:
+            raise Exception(f"Already subscribed to this broadcast.")
         else:
-            self._queues[consumer.name] = multiprocessing.Queue(maxsize=10)
-            return self._queues[consumer.name]
+            rec, send = multiprocessing.Pipe()
+            self._pipes[name] = send
+            consumer.subscribe(self.name, rec)
         
-    def remove(self, consumer):
-        if consumer.name in self._queues:
-            del self._queues[consumer.name]
-            print("Unsubbed")
+    def unsubscribe(self, name):
+        if name in self._pipes:
+            del self._pipes[name]
         else:
-            raise Exception(f"Cannot remove as it isn't attached.")
+            raise Exception(f"Cannot unsubscribe as it isn't subscribed.")
         
     def broadcast_worker(self):
         capture = cv2.VideoCapture(self.source)
@@ -31,9 +32,8 @@ class Broadcast:
         while True:
             ret, frame = capture.read()
 
-            for key, queue in self._queues.items():
-                if not queue.full():
-                    queue.put(frame)
+            for key, pipe in self._pipes.items():
+                pipe.send(frame)
             
             time.sleep(1/fps)
         capture.release()

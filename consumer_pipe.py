@@ -5,7 +5,7 @@ import time
 class Consumer:
     def __init__(self, name):
         self.name = name
-        self._queues = {}
+        self._pipes = {}
         self._frames = {}
         self._display = True
         self._show_fps = True
@@ -14,36 +14,26 @@ class Consumer:
         self._fps_history_iter = 0
         self._fps = 0
         self._avg_fps = 0
-        self._connected_nodes = []
 
-    def subscribe(self, broadcast):
-        if broadcast.name in self._queues:
+    def subscribe(self, name, pipe):
+        if name in self._pipes:
             raise Exception("Already subscribed to this broadcast.")
         else:
-            self._queues[broadcast.name] = broadcast.attach(self)
-            self._connected_nodes.append(broadcast)
+            self._pipes[name] = pipe
     
-    def unsubscribe(self, broadcast):
-        if broadcast.name in self._queues:
-            del self._queues[broadcast.name]
-            broadcast.remove(self)
-            if broadcast.name in self._frames:
-                del self._frames[broadcast.name]
+    def unsubscribe(self, name):
+        if name in self._pipes:
+            del self._pipes[name]
+            if name in self._frames:
+                del self._frames[name]
         else:
             raise Exception("Cannot unsubscribe as it isn't subscribed.")
-    
-    def __unsubscribe_all(self):
-        for node in self._connected_nodes:
-            self.unsubscribe(node)
 
     def consumer_worker(self):
         while True:
-            updateFPS = True
-            for key, queue in self._queues.items():
-                if not queue.empty():
-                    self._frames[key] = queue.get()
-                    if updateFPS: self.__update_fps()
-                    updateFPS = False
+            for key, pipe in self._pipes.items():
+                    self._frames[key] = pipe.recv()
+                    self.__update_fps()
 
             if self._frames:
                 frame = self.process_frames(self._frames) if len(self._frames) > 1 else self.process_frame(next(iter(self._frames.values())))
@@ -51,10 +41,9 @@ class Consumer:
                 if self._display:
                     self.__display(frame)
                     # Press ESC key or close window to stop consumer.
-                    if cv2.waitKey(1) == 27:
+                    if cv2.waitKey(1) == 27 or cv2.getWindowProperty(self.name ,cv2.WND_PROP_VISIBLE) < 1:
                         break
-        cv2.destroyWindow(self.name)
-        self.__unsubscribe_all()
+        cv2.destroyAllWindows()
     
     def process_frame(self, frame):
         return frame

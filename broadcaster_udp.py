@@ -27,8 +27,8 @@ class Broadcaster:
             frameOK, frame = capture.read()
             encodeOK, encodedFrame = cv2.imencode(".jpg", frame)
             data = encodedFrame.tobytes()
-
             total_chunks = len(data) // CHUNKSIZE + (1 if len(data) % CHUNKSIZE > 0 else 0)
+
             for i in range(total_chunks):
                 start_idx = i * CHUNKSIZE
                 end_idx = (i + 1) * CHUNKSIZE
@@ -37,7 +37,6 @@ class Broadcaster:
                 header = struct.pack('!II', i, total_chunks)
                 packet = header + chunk
 
-                # Send the chunk to the multicast group
                 broadcaster_socket.sendto(packet, (multicast_ip, multicast_port))
 
             time.sleep(sleepTime)

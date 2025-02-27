@@ -1,4 +1,4 @@
-from consumer import Consumer
+from consumer_mpq import Consumer
 import cv2
 import numpy as np
 

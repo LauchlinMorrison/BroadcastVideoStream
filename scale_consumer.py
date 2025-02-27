@@ -1,7 +1,7 @@
 from consumer_mpq import Consumer
 import cv2
 
-class DownsampleConsumer(Consumer):
+class ScaleConsumer(Consumer):
     def __init__(self, name, ratio):
         super().__init__(name,)
         self.ratio = ratio

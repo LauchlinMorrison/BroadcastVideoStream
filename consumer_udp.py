@@ -43,6 +43,7 @@ class Consumer:
         consumer_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         consumer_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         consumer_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        consumer_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
         group = socket.inet_aton(self.multicast_ip)
         mreq = struct.pack('4sL', group, socket.INADDR_ANY)
         consumer_socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)

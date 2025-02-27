@@ -1,9 +1,8 @@
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
-import multiprocessing
-import broadcaster as bc
-import consumer as csmr
-import downsample_consumer as down
+import broadcaster_udp as bc
+import consumer_udp as csmr
+import scale_consumer as down
 import detection_consumer as det
 
 def main():
@@ -17,7 +16,7 @@ def main():
     displayCamera.display_fps()
     displayCameraProc = displayCamera.start()
 
-    downsample = down.DownsampleConsumer("Downsample", 0.2)
+    downsample = down.ScaleConsumer("Downsample", 0.2)
     downsample.display_fps()
     downsampleProc = downsample.start()
 
