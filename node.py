@@ -9,7 +9,7 @@ class Node(multiprocessing.Process):
         self.id = node_id
         self.ledger = ledger
         self.source = source
-        self.exit = False
+        self.exit = multiprocessing.Event()
         self.frames_in = {}
         self.frame_out = None
         self.consumer_logic = consumer_logic
@@ -47,7 +47,7 @@ class Node(multiprocessing.Process):
         cv2.imshow(f'{self.id}', frame)
         # Press ESC key or close window to stop consumer.
         if cv2.waitKey(1) == 27:
-            self.exit = True
+            self.exit.set()
             cv2.destroyWindow(self.id)
 
     def __consume(self):
@@ -89,9 +89,10 @@ class Node(multiprocessing.Process):
             capture = cv2.VideoCapture(self.source)
             fps = capture.get(cv2.CAP_PROP_FPS)
 
-        while not self.exit:
+        self.exit.clear()
+        while not self.exit.is_set():
             if self.id in self.ledger:
-                
+
                 # Consumer logic
                 if self.consumer_logic is not None:
                     self.__consume()
@@ -105,3 +106,6 @@ class Node(multiprocessing.Process):
 
             #self.__clear_frames()
         print(f"[{self.id}] node process ended.")
+
+    def stop(self):
+        self.exit.set()

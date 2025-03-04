@@ -44,23 +44,29 @@ def main():
         nodes["detection"] = Node("detection", communication_dictionary, None, DetectionConsumer())
         nodes["rebroadcast"] = Node("rebroadcast", communication_dictionary, "re-broadcast", DisplayConsumer())
         nodes["display"] = Node("display", communication_dictionary, None, DisplayConsumer())
-        nodes[""]
+        nodes["merge"] = Node("merge", communication_dictionary, None, MergeConsumer())
+        nodes["scale"] = Node("scale", communication_dictionary, None, ScaleConsumer(0.3))
 
         for node in nodes.values():
             node.start()
 
         subscribe(manager, communication_dictionary, nodes["camera"], nodes["detection"])
         subscribe(manager, communication_dictionary, nodes["camera"], nodes["rebroadcast"])
+        subscribe(manager, communication_dictionary, nodes["camera"], nodes["merge"])
+        subscribe(manager, communication_dictionary, nodes["video"], nodes["merge"])
+        subscribe(manager, communication_dictionary, nodes["video"], nodes["scale"])
         subscribe(manager, communication_dictionary, nodes["rebroadcast"], nodes["display"])
-
-        nodes["display"].join()
-
-        unsubscribe(communication_dictionary, nodes["camera"], nodes["display2"])
-        subscribe(manager, communication_dictionary, nodes["display2"], nodes["video"])
 
         # Await all processes to be complete
         for node in nodes.values():
-            node.join()
+            if node.consumer_logic is not None:
+                node.join()
+        
+        for node in nodes.values():
+            if node.consumer_logic is None:
+                node.stop()
+        
+        print("Application ended")
 
 if __name__ == "__main__":
     main()
