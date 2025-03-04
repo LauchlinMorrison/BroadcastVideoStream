@@ -109,3 +109,6 @@ class Node(multiprocessing.Process):
 
     def stop(self):
         self.exit.set()
+
+    def hide(self, isHidden=True):
+        self.display = not isHidden

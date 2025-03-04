@@ -6,6 +6,7 @@ from display_consumer import DisplayConsumer
 from detection_consumer import DetectionConsumer
 from scale_consumer import ScaleConsumer
 from merge_consumer import MergeConsumer
+from draw_box_consumer import DrawBoxConsumer
 
 def subscribe(manager, communication_ledger, broadcast, consumer):
     queue = manager.Queue(1)
@@ -42,7 +43,8 @@ def main():
         nodes["camera"] = Node("camera", communication_dictionary, 0)
         nodes["video"] = Node("video", communication_dictionary, "C:/Users/Lauch/Videos/2025-02-14 11-15-10.mp4")
         nodes["detection"] = Node("detection", communication_dictionary, None, DetectionConsumer())
-        nodes["rebroadcast"] = Node("rebroadcast", communication_dictionary, "re-broadcast", DisplayConsumer())
+        nodes["rebroadcast"] = Node("rebroadcast", communication_dictionary, "re-broadcast", DrawBoxConsumer())
+        #nodes["rebroadcast"].hide()
         nodes["display"] = Node("display", communication_dictionary, None, DisplayConsumer())
         nodes["merge"] = Node("merge", communication_dictionary, None, MergeConsumer())
         nodes["scale"] = Node("scale", communication_dictionary, None, ScaleConsumer(0.3))
@@ -59,7 +61,7 @@ def main():
 
         # Await all processes to be complete
         for node in nodes.values():
-            if node.consumer_logic is not None:
+            if node.display is not None:
                 node.join()
         
         for node in nodes.values():
