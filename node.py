@@ -88,6 +88,7 @@ class Node(multiprocessing.Process):
         if self.source is not None and self.source != "re-broadcast":
             capture = cv2.VideoCapture(self.source)
             fps = capture.get(cv2.CAP_PROP_FPS)
+            print(f"Source fps: {fps}")
 
         self.exit.clear()
         while not self.exit.is_set():
