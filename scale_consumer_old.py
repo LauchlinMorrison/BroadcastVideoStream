@@ -1,8 +1,9 @@
-from IConsumer import IConsumer
+from consumer_mpq import Consumer
 import cv2
 
-class ScaleConsumer(IConsumer):
-    def __init__(self, ratio):
+class ScaleConsumer(Consumer):
+    def __init__(self, name, ratio):
+        super().__init__(name,)
         self.ratio = ratio
 
     def process_frame(self, frame):
@@ -12,6 +13,3 @@ class ScaleConsumer(IConsumer):
             fy=self.ratio, 
             interpolation=cv2.INTER_NEAREST)
         return frame
-    
-    def process_frames(self, frames):
-        return self.process_frame(next(iter(frames.values())))

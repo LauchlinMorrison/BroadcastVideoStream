@@ -1,10 +1,11 @@
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import broadcaster_mpq
-import consumer_mpq
-import scale_consumer
-import detection_consumer
-import merge_consumer
+from consumer_mpq import Consumer
+from display_consumer import DisplayConsumer
+from scale_consumer import ScaleConsumer
+from detection_consumer import DetectionConsumer
+from merge_consumer import MergeConsumer
 
 def main():
     #source = "C:/Users/Lauch/Videos/2025-02-14 11-15-10.mp4"
@@ -16,10 +17,10 @@ def main():
     broadcasts.append(broadcast.start())
     broadcasts.append(broadcast2.start())
 
-    display = consumer_mpq.Consumer("Display")
-    merge = merge_consumer.MergeConsumer("Merge")
-    scale = scale_consumer.ScaleConsumer("Downsample", 0.3)
-    detect = detection_consumer.DetectionConsumer("Detect")
+    display = Consumer("Display", DisplayConsumer())
+    merge = Consumer("Merge", MergeConsumer())
+    scale = Consumer("Downsample", ScaleConsumer(0.3))
+    detect = Consumer("Detect", DetectionConsumer())
 
     display.subscribe(broadcast)
     merge.subscribe(broadcast)

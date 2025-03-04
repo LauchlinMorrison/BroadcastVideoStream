@@ -1,8 +1,12 @@
-from IConsumer import IConsumer
+from consumer_mpq import Consumer
 import cv2
 import numpy as np
 
-class DetectionConsumer(IConsumer):
+class DetectionConsumer(Consumer):
+    def __init__(self, name):
+        super().__init__(name,)
+
+    # Detect circles by shifting the frame to grayscale, applying blur and searching with the HoughCircles method.
     def process_frame(self, frame):
         modifiedFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         modifiedFrame = cv2.blur(modifiedFrame, (10, 10))
@@ -32,6 +36,3 @@ class DetectionConsumer(IConsumer):
                 cv2.putText(frame, text, (a+r, b-r), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
         return frame
-    
-    def process_frames(self, frames):
-        return self.process_frame(next(iter(frames.values())))

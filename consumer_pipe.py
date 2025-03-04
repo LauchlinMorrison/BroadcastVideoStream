@@ -3,7 +3,7 @@ import cv2
 import time
 
 class Consumer:
-    def __init__(self, name):
+    def __init__(self, name, logic):
         self.name = name
         self._pipes = {}
         self._frames = {}
@@ -14,6 +14,7 @@ class Consumer:
         self._fps_history_iter = 0
         self._fps = 0
         self._avg_fps = 0
+        self.logic = logic
 
     def subscribe(self, name, pipe):
         if name in self._pipes:
@@ -36,7 +37,7 @@ class Consumer:
                     self.__update_fps()
 
             if self._frames:
-                frame = self.process_frames(self._frames) if len(self._frames) > 1 else self.process_frame(next(iter(self._frames.values())))
+                frame = self.logic.process_frames(self._frames) if len(self._frames) > 1 else self.logic.process_frame(next(iter(self._frames.values())))
                 
                 if self._display:
                     self.__display(frame)
@@ -44,13 +45,6 @@ class Consumer:
                     if cv2.waitKey(1) == 27 or cv2.getWindowProperty(self.name ,cv2.WND_PROP_VISIBLE) < 1:
                         break
         cv2.destroyAllWindows()
-    
-    def process_frame(self, frame):
-        return frame
-
-    def process_frames(self, frames):
-        frame = next(iter(frames.values()))
-        return frame
 
     def __display(self, frame):
         if self._show_fps: self.__draw_fps(frame)

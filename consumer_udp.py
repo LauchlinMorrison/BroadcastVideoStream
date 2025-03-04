@@ -6,7 +6,7 @@ import multiprocessing
 import time
 
 class Consumer:
-    def __init__(self, name, multicast_port=5000, multicast_ip="224.1.1.1"):
+    def __init__(self, name, logic, multicast_port=5000, multicast_ip="224.1.1.1"):
         self.name = name
         self.multicast_ip = multicast_ip
         self.multicast_port = multicast_port
@@ -14,6 +14,7 @@ class Consumer:
         self._last_frame_time = None
         self._fps_history = [0]* 40
         self._fps_history_iter = 0
+        self.logic = logic
 
     def set_multicast_address(self, port, ip="224.1.1.1"):
         """Set the UDP multicast address. (Port & IP)"""
@@ -84,7 +85,7 @@ class Consumer:
         Performs any processing to the frame and display's it to the screen.
         Returns false if the process should end.
         """
-        frame = self.process_frame(frame)
+        frame = self.logic.process_frame(frame)
         if self._display_fps == True: frame = self.__draw_fps(frame)
         cv2.imshow(self.name, frame)
 
@@ -94,10 +95,6 @@ class Consumer:
         if cv2.getWindowProperty(self.name ,cv2.WND_PROP_VISIBLE) < 1:
             return False
         return True
-
-    def process_frame(self, frame):
-        # override in children
-        return frame
     
     def start(self):
         """Start the consumer process."""

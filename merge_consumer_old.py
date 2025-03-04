@@ -1,10 +1,11 @@
-from IConsumer import IConsumer
+from consumer_mpq import Consumer
+import cv2
 import numpy as np
 
-class MergeConsumer(IConsumer):
-    def process_frame(self, frame):
-        return frame
-    
+class MergeConsumer(Consumer):
+    def __init__(self, name):
+        super().__init__(name,)
+
     def process_frames(self, frames):
         
         img1 = frames["camera"]

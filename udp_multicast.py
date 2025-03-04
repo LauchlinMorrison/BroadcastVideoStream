@@ -1,9 +1,10 @@
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import broadcaster_udp as bc
-import consumer_udp as csmr
-import scale_consumer as down
-import detection_consumer as det
+from consumer_udp import Consumer
+from display_consumer import DisplayConsumer
+from scale_consumer import ScaleConsumer
+from detection_consumer import DetectionConsumer
 
 def main():
     videoSource = "C:/Users/Lauch/Videos/2025-02-14 11-15-10.mp4"
@@ -12,19 +13,19 @@ def main():
     broadcast.register_broadcast()
     broadcast.register_broadcast("C:/Users/Lauch/Videos/2025-02-14 11-15-10.mp4", 5001)
 
-    displayCamera = csmr.Consumer("Camera")
+    displayCamera = Consumer("Camera", DisplayConsumer())
     displayCamera.display_fps()
     displayCameraProc = displayCamera.start()
 
-    downsample = down.ScaleConsumer("Downsample", 0.2)
+    downsample = Consumer("Downsample", ScaleConsumer(0.2))
     downsample.display_fps()
     downsampleProc = downsample.start()
 
-    detect = det.DetectionConsumer("Detect")
+    detect = Consumer("Detect", DetectionConsumer())
     detect.display_fps()
     detectProc = detect.start()
 
-    displayVideo = csmr.Consumer("Video", 5001)
+    displayVideo = Consumer("Video", DisplayConsumer(), 5001)
     displayVideo.display_fps()
     displayVideoProc = displayVideo.start()
 

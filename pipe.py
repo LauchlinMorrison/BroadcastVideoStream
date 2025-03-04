@@ -1,10 +1,10 @@
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import broadcaster_pipe
-import consumer_pipe
-import scale_consumer
-import detection_consumer
-import merge_consumer
+from consumer_pipe import Consumer
+from display_consumer import DisplayConsumer
+from scale_consumer import ScaleConsumer
+from detection_consumer import DetectionConsumer
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
     broadcast2 = broadcaster_pipe.Broadcast("video", "C:/Users/Lauch/Videos/2025-02-14 11-15-10.mp4")
     thread2 = broadcast2.start()
     
-    consumer4 = consumer_pipe.Consumer("display4")
+    consumer4 = Consumer("display4", DisplayConsumer())
     broadcast.subscribe(consumer4)
     consumerProcesses.append(consumer4.start())
 
